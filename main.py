@@ -48,19 +48,6 @@ def home():
         "message": "API Running Successfully"
     }
 
-cursor_obj.execute("""
-CREATE TABLE IF NOT EXISTS expenses(
-    expense_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200),
-    amount FLOAT,
-    category VARCHAR(100),
-    payment_method VARCHAR(100),
-    expense_date DATE,
-    description TEXT
-)
-""")
-
-conn_obj.commit()
 
 @app.get("/")
 def home():
