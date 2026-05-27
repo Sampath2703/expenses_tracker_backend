@@ -49,12 +49,7 @@ def home():
     }
 
 
-@app.get("/")
-def home():
 
-    return {
-        "message": "API Running Successfully"
-    }
 
 # Add Expense
 @app.post("/expenses")
