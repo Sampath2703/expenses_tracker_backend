@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException
 import mysql.connector
 import os
 from dotenv import load_dotenv
@@ -30,8 +31,8 @@ conn_obj = mysql.connector.connect(
 
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 cursor_obj.execute("""
-CREATE TABLE expense (
-    exp_id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE if not exists expense (
+    expenses_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     amount FLOAT NOT NULL,
     category VARCHAR(100) NOT NULL,
@@ -87,7 +88,7 @@ def get_expenses():
 @app.get("/get_expenses_single/{expenses_id}")
 def get_single_expense(expenses_id: int):
 
-    query = "SELECT * FROM expense WHERE exp_id=%s"
+    query = "SELECT * FROM expense WHERE expenses_id=%s"
 
     cursor_obj.execute(query, (expenses_id,))
     data = cursor_obj.fetchone()
@@ -107,7 +108,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
         amount=%s,
         category=%s,
         spent_at=%s
-    WHERE exp_id=%s
+    WHERE expenses_id=%s
     """
 
     values = (
@@ -127,7 +128,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
 @app.delete("/delete_expenses/{expense_id}")
 def delete_expense(expense_id: int):
 
-    query = "DELETE FROM expense WHERE exp_id=%s"
+    query = "DELETE FROM expense WHERE expenses_id=%s"
 
     cursor_obj.execute(query, (expense_id,))
     conn_obj.commit()
