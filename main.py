@@ -1,51 +1,82 @@
-import mysql.connector
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+import mysql.connector
+import os
+from dotenv import load_dotenv
 
+# Load .env file
+load_dotenv()
+
+# FastAPI app
+app = FastAPI()
+
+# CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],   # Change to frontend URL in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# MySQL Connection
 conn_obj = mysql.connector.connect(
-    host="localhost",  
-    user="root",
-    password="Nani@2703",
-    database="expenses"
+    host=os.getenv("DB_HOST"),
+    user=os.getenv("DB_USER"),
+    password=os.getenv("DB_PASSWORD"),
+    database=os.getenv("DB_NAME"),
+    port=int(os.getenv("DB_PORT", 3306))
 )
 
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 
-app = FastAPI()
-
+# Add Expense
 @app.post("/expenses")
-def add_expenses(expenses_data:dict):
-    title = expenses_data["title"]
-    amount = expenses_data["amount"]
-    category = expenses_data["category"]
-    spent_at = expenses_data["spent_at"]
+def add_expenses(expenses_data: dict):
 
+    query = """
+    INSERT INTO expense(title, amount, category, spent_at)
+    VALUES(%s, %s, %s, %s)
+    """
 
-    query = "insert into expense(title, amount, category, spent_at) values(%s, %s, %s, %s)"
-    values = (expenses_data["title"], expenses_data["amount"], expenses_data["category"], expenses_data["spent_at"])
+    values = (
+        expenses_data["title"],
+        expenses_data["amount"],
+        expenses_data["category"],
+        expenses_data["spent_at"]
+    )
+
     cursor_obj.execute(query, values)
     conn_obj.commit()
-    return {"message": "Expenses Added Successfully"}
 
+    return {"message": "Expense Added Successfully"}
+
+# Get All Expenses
 @app.get("/get_expenses")
 def get_expenses():
-    query = "select * from expense"
+
+    query = "SELECT * FROM expense"
+
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
-    return {"expenses":data}
 
+    return {"expenses": data}
+
+# Get Single Expense
 @app.get("/get_expenses_single/{expenses_id}")
-def get_e(expenses_id: int):
+def get_single_expense(expenses_id: int):
 
     query = "SELECT * FROM expense WHERE exp_id=%s"
 
     cursor_obj.execute(query, (expenses_id,))
-    dataa = cursor_obj.fetchone()
+    data = cursor_obj.fetchone()
 
-    if dataa:
-        return {"expenses_data": dataa}
+    if data:
+        return {"expense_data": data}
 
-    return {"expenses_data": None}
-    
+    return {"expense_data": None}
+
+# Update Expense
 @app.put("/update_expenses/{expenses_id}")
 def update_expenses(expenses_id: int, updated_expenses_data: dict):
 
@@ -71,6 +102,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
 
     return {"message": "Expense Updated Successfully"}
 
+# Delete Expense
 @app.delete("/delete_expenses/{expense_id}")
 def delete_expense(expense_id: int):
 
@@ -79,41 +111,76 @@ def delete_expense(expense_id: int):
     cursor_obj.execute(query, (expense_id,))
     conn_obj.commit()
 
-    return {"message": "Expense deleted successfully"}
+    return {"message": "Expense Deleted Successfully"}
 
+# Search Expenses
 @app.get("/search_expenses")
-def search_expense(search_text:str):
+def search_expense(search_text: str):
 
-    query = "select * from expense where category like %s or title like %s"
- 
-    cursor_obj.execute(query ,(f"%{search_text}%", f"%{search_text}%"))
+    query = """
+    SELECT * FROM expense
+    WHERE category LIKE %s OR title LIKE %s
+    """
+
+    cursor_obj.execute(
+        query,
+        (f"%{search_text}%", f"%{search_text}%")
+    )
+
     data = cursor_obj.fetchall()
-
 
     return {"expenses": data}
 
+# Sort Expenses
 @app.get("/sort_expenses")
-def sort_expenses(sort_by:str, order_by:str):
+def sort_expenses(sort_by: str, order_by: str):
 
-    query = f"select * from expense order by {sort_by} {order_by}"
+    allowed_columns = ["title", "amount", "category", "spent_at"]
+    allowed_order = ["asc", "desc"]
+
+    if sort_by.lower() not in allowed_columns:
+        return {"error": "Invalid sort column"}
+
+    if order_by.lower() not in allowed_order:
+        return {"error": "Invalid order"}
+
+    query = f"""
+    SELECT * FROM expense
+    ORDER BY {sort_by} {order_by.upper()}
+    """
+
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
 
-    return {"Expenses" : data}
+    return {"expenses": data}
 
-@app.get("/filter_expenses/{Filter_by}")
-def filter_expensess(Filter_by:str):
+# Filter Expenses
+@app.get("/filter_expenses/{filter_by}")
+def filter_expenses(filter_by: str):
 
-    query = "select * from expense where category = %s"
-    cursor_obj.execute(query,(Filter_by,))
+    query = "SELECT * FROM expense WHERE category=%s"
+
+    cursor_obj.execute(query, (filter_by,))
     data = cursor_obj.fetchall()
 
-    return {"message": data}
+    return {"expenses": data}
 
-@app.get("/analyze_expenses/{Analyze_by}")
-def analyze_expenses(Analyze_by:str):
-    query = f"select {Analyze_by}, sum(amount) from expense group by {Analyze_by}"
+# Analyze Expenses
+@app.get("/analyze_expenses/{analyze_by}")
+def analyze_expenses(analyze_by: str):
+
+    allowed_columns = ["category", "spent_at"]
+
+    if analyze_by.lower() not in allowed_columns:
+        return {"error": "Invalid analyze column"}
+
+    query = f"""
+    SELECT {analyze_by}, SUM(amount) AS total_amount
+    FROM expense
+    GROUP BY {analyze_by}
+    """
+
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
 
-    return {"message": data}
+    return {"analysis": data}
