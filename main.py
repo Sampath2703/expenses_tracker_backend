@@ -30,15 +30,13 @@ conn_obj = mysql.connector.connect(
 
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 cursor_obj.execute("""
-CREATE TABLE IF NOT EXISTS expense(
+CREATE TABLE expense (
     expense_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200),
-    amount FLOAT,
-    category VARCHAR(100),
-    payment_method VARCHAR(100),
-    expense_date DATE,
-    description TEXT
-)
+    title VARCHAR(200) NOT NULL,
+    amount FLOAT NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    expense_date DATE NOT NULL
+);
 """)
 
 conn_obj.commit()
