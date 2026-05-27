@@ -31,7 +31,7 @@ conn_obj = mysql.connector.connect(
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 cursor_obj.execute("""
 CREATE TABLE expense (
-    expense_id INT AUTO_INCREMENT PRIMARY KEY,
+    exp_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     amount FLOAT NOT NULL,
     category VARCHAR(100) NOT NULL,
