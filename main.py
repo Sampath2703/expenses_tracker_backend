@@ -30,7 +30,7 @@ conn_obj = mysql.connector.connect(
 
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 cursor_obj.execute("""
-CREATE TABLE IF NOT EXISTS expenses(
+CREATE TABLE IF NOT EXISTS expense(
     expense_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200),
     amount FLOAT,
