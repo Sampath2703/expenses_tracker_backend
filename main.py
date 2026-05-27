@@ -35,7 +35,7 @@ CREATE TABLE expense (
     title VARCHAR(200) NOT NULL,
     amount FLOAT NOT NULL,
     category VARCHAR(100) NOT NULL,
-    expense_date DATE NOT NULL
+    spent_at DATE NOT NULL
 );
 """)
 
