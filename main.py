@@ -21,14 +21,55 @@ app.add_middleware(
 
 # MySQL Connection
 conn_obj = mysql.connector.connect(
-    host=os.getenv("DB_HOST"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    database=os.getenv("DB_NAME"),
-    port=int(os.getenv("DB_PORT", 3306))
+    host=os.getenv("db_host"),
+    user=os.getenv("db_user"),
+    password=os.getenv("db_password"),
+    database=os.getenv("db_database"),
+    port=int(os.getenv("db_port", 3306))
 )
 
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
+cursor_obj.execute("""
+CREATE TABLE IF NOT EXISTS expenses(
+    expense_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200),
+    amount FLOAT,
+    category VARCHAR(100),
+    payment_method VARCHAR(100),
+    expense_date DATE,
+    description TEXT
+)
+""")
+
+conn_obj.commit()
+
+@app.get("/")
+def home():
+
+    return {
+        "message": "API Running Successfully"
+    }
+
+cursor_obj.execute("""
+CREATE TABLE IF NOT EXISTS expenses(
+    expense_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200),
+    amount FLOAT,
+    category VARCHAR(100),
+    payment_method VARCHAR(100),
+    expense_date DATE,
+    description TEXT
+)
+""")
+
+conn_obj.commit()
+
+@app.get("/")
+def home():
+
+    return {
+        "message": "API Running Successfully"
+    }
 
 # Add Expense
 @app.post("/expenses")
