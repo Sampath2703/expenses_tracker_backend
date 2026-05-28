@@ -31,7 +31,7 @@ conn_obj = mysql.connector.connect(
 
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 cursor_obj.execute("""
-CREATE TABLE if not exists expense (
+CREATE TABLE if not exists expenses1 (
     expense_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     payment_method varchar(50) Not Null,
@@ -59,7 +59,7 @@ def add_expenses(expenses_data: dict):
 
     try:
         query = """
-        INSERT INTO expense
+        INSERT INTO expenses1
         (title, payment_method, amount, category, spent_at)
         VALUES (%s, %s, %s, %s, %s)
         """
@@ -82,7 +82,7 @@ def add_expenses(expenses_data: dict):
 
 @app.get("/get_expenses")
 def get_expenses():
-    query = "select * from expense"
+    query = "select * from expenses1"
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
     return {"expenses":data}
@@ -90,7 +90,7 @@ def get_expenses():
 @app.get("/get_expenses_single/{expenses_id}")
 def get_e(expenses_id: int):
 
-    query = "SELECT * FROM expense WHERE expense_id=%s"
+    query = "SELECT * FROM expenses1 WHERE expense_id=%s"
 
     cursor_obj.execute(query, (expenses_id,))
     data = cursor_obj.fetchone()
@@ -108,7 +108,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
     try:
 
         query = """
-        UPDATE expense
+        UPDATE expenses1
         SET
             title=%s,
             amount=%s,
@@ -146,7 +146,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
 @app.delete("/delete_expenses/{expense_id}")
 def delete_expense(expense_id: int):
 
-    query = "DELETE FROM expense WHERE expense_id=%s"
+    query = "DELETE FROM expenses1 WHERE expense_id=%s"
 
     cursor_obj.execute(query, (expense_id,))
     conn_obj.commit()
@@ -156,7 +156,7 @@ def delete_expense(expense_id: int):
 @app.get("/search_expenses")
 def search_expense(search_text:str):
 
-    query = "select * from expense where category like %s or title like %s"
+    query = "select * from expenses1 where category like %s or title like %s"
     cursor_obj.execute(query ,(f"%{search_text}%", f"%{search_text}%"))
     data = cursor_obj.fetchall()
 
@@ -166,7 +166,7 @@ def search_expense(search_text:str):
 @app.get("/sort_expenses")
 def sort_expenses(sort_by:str, order_by:str):
 
-    query = f"select * from expense order by {sort_by} {order_by}"
+    query = f"select * from expenses1 order by {sort_by} {order_by}"
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
 
@@ -175,7 +175,7 @@ def sort_expenses(sort_by:str, order_by:str):
 @app.get("/filter_expenses/{Filter_by}")
 def filter_expensess(Filter_by:str):
 
-    query = "select * from expense where category = %s"
+    query = "select * from expenses1 where category = %s"
     cursor_obj.execute(query,(Filter_by,))
     data = cursor_obj.fetchall()
 
@@ -183,7 +183,7 @@ def filter_expensess(Filter_by:str):
 
 @app.get("/analyze_expenses/{Analyze_by}")
 def analyze_expenses(Analyze_by:str):
-    query = f"select {Analyze_by}, sum(amount) from expense group by {Analyze_by}"
+    query = f"select {Analyze_by}, sum(amount) from expenses1 group by {Analyze_by}"
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
 
