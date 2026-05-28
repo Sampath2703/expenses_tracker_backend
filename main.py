@@ -169,27 +169,47 @@ def search_expense(search_text:str):
     return {"expenses": data}
 
 @app.get("/sort_expenses")
-def sort_expenses(sort_by:str, order_by:str):
+def sort_expenses(sort_by: str, order_by: str):
 
-    query = f"select * from expenses1 order by {sort_by} {order_by}"
+    allowed_columns = ["payment_method", "amount", "category", "spent_at"]
+    allowed_order = ["asc", "desc"]
+
+    if sort_by not in allowed_columns or order_by not in allowed_order:
+        return {"error": "Invalid parameters"}
+
+    query = f"SELECT * FROM expenses1 ORDER BY {sort_by} {order_by}"
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
 
-    return {"Expenses" : data}
+    return {"expenses": data}
 
-@app.get("/filter_expenses/{Filter_by}")
-def filter_expensess(Filter_by:str):
+@app.get("/filter_expenses/{filter_by}")
+def filter_expenses(filter_by: str):
 
-    query = "select * from expenses1 where category = %s"
-    cursor_obj.execute(query,(Filter_by,))
+    cursor_obj.execute(
+        "SELECT * FROM expenses1 WHERE category=%s",
+        (filter_by,)
+    )
+
     data = cursor_obj.fetchall()
 
-    return {"message": data}
+    return {"expenses": data}
 
-@app.get("/analyze_expenses/{Analyze_by}")
-def analyze_expenses(Analyze_by:str):
-    query = f"select {Analyze_by}, sum(amount) from expenses1 group by {Analyze_by}"
+@app.get("/analyze_expenses/{analyze_by}")
+def analyze_expenses(analyze_by: str):
+
+    allowed = ["category", "payment_method", "spent_at"]
+
+    if analyze_by not in allowed:
+        return {"error": "Invalid field"}
+
+    query = f"""
+        SELECT {analyze_by}, SUM(amount) as total
+        FROM expenses1
+        GROUP BY {analyze_by}
+    """
+
     cursor_obj.execute(query)
     data = cursor_obj.fetchall()
 
-    return {"message": data}
+    return {"expenses": data}
