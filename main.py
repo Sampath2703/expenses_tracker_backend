@@ -34,6 +34,7 @@ cursor_obj.execute("""
 CREATE TABLE if not exists expense (
     exp_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
+    payment_method Not Null,
     amount FLOAT NOT NULL,
     category VARCHAR(100) NOT NULL,
     spent_at DATE NOT NULL
@@ -56,13 +57,14 @@ def home():
 @app.post("/expenses")
 def add_expenses(expenses_data:dict):
     title = expenses_data["title"]
+    payment_method = expenses_data["payment_method"]
     amount = expenses_data["amount"]
     category = expenses_data["category"]
     spent_at = expenses_data["spent_at"]
 
 
-    query = "insert into expense(title, amount, category, spent_at) values(%s, %s, %s, %s)"
-    values = (expenses_data["title"], expenses_data["amount"], expenses_data["category"], expenses_data["spent_at"])
+    query = "insert into expense(title, payment_method, amount, category, spent_at) values(%s, %s, %s, %s, %s)"
+    values = (expenses_data["title"],expenses_data["payment_method"], expenses_data["amount"], expenses_data["category"], expenses_data["spent_at"])
     cursor_obj.execute(query, values)
     conn_obj.commit()
     return {"message": "Expenses Added Successfully"}
