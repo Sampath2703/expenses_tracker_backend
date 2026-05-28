@@ -32,7 +32,7 @@ conn_obj = mysql.connector.connect(
 cursor_obj = conn_obj.cursor(dictionary=True, buffered=True)
 cursor_obj.execute("""
 CREATE TABLE if not exists expense (
-    exp_id INT AUTO_INCREMENT PRIMARY KEY,
+    expense_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
     payment_method varchar(50) Not Null,
     amount FLOAT NOT NULL,
@@ -102,7 +102,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
             category=%s,
             payment_method=%s,
             spent_at=%s
-        WHERE exp_id=%s
+        WHERE expense_id=%s
         """
 
         values = (
@@ -133,7 +133,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
 @app.delete("/delete_expenses/{expense_id}")
 def delete_expense(expense_id: int):
 
-    query = "DELETE FROM expense WHERE exp_id=%s"
+    query = "DELETE FROM expense WHERE expense_id=%s"
 
     cursor_obj.execute(query, (expense_id,))
     conn_obj.commit()
