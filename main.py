@@ -151,7 +151,11 @@ def delete_expense(expense_id: int):
     cursor_obj.execute(query, (expense_id,))
     conn_obj.commit()
 
+    if cursor_obj.rowcount == 0:
+        return {"message": "Expense not found"}
+
     return {"message": "Expense deleted successfully"}
+
 
 @app.get("/search_expenses")
 def search_expense(search_text:str):
