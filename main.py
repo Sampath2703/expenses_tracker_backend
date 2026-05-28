@@ -55,19 +55,30 @@ def home():
 
 # Add Expense
 @app.post("/expenses")
-def add_expenses(expenses_data:dict):
-    title = expenses_data["title"]
-    payment_method = expenses_data["payment_method"]
-    amount = expenses_data["amount"]
-    category = expenses_data["category"]
-    spent_at = expenses_data["spent_at"]
+def add_expenses(expenses_data: dict):
 
+    try:
+        query = """
+        INSERT INTO expense
+        (title, payment_method, amount, category, spent_at)
+        VALUES (%s, %s, %s, %s, %s)
+        """
 
-    query = "insert into expense(title, payment_method, amount, category, spent_at) values(%s, %s, %s, %s, %s)"
-    values = (expenses_data["title"],expenses_data["payment_method"], expenses_data["amount"], expenses_data["category"], expenses_data["spent_at"])
-    cursor_obj.execute(query, values)
-    conn_obj.commit()
-    return {"message": "Expenses Added Successfully"}
+        values = (
+            expenses_data.get("title"),
+            expenses_data.get("payment_method"),
+            expenses_data.get("amount"),
+            expenses_data.get("category"),
+            expenses_data.get("spent_at")
+        )
+
+        cursor_obj.execute(query, values)
+        conn_obj.commit()
+
+        return {"message": "Expenses Added Successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/get_expenses")
 def get_expenses():
