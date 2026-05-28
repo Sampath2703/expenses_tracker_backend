@@ -143,20 +143,24 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
             "error": str(e)
         }
 
-@app.delete("/delete_expense/{expense_id_to_del}")
+@app.delete("/delete_expense/{expense_id}")
 def delete_expense(expense_id: int):
 
-    cursor_obj.execute(
-        "DELETE FROM expenses1 WHERE expense_id=%s",
-        (expense_id,)
-    )
-    conn_obj.commit()
+    try:
+        cursor_obj.execute(
+            "DELETE FROM expenses1 WHERE expense_id=%s",
+            (expense_id,)
+        )
 
-    if cursor_obj.rowcount == 0:
-        return {"message": "Expense not found"}
+        conn_obj.commit()
 
-    return {"message": "Expense deleted successfully"}
+        if cursor_obj.rowcount == 0:
+            return {"message": "Expense not found"}
 
+        return {"message": "Expense deleted successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}
 
 @app.get("/search_expenses")
 def search_expense(search_text:str):
