@@ -143,7 +143,7 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
             "error": str(e)
         }
 
-@app.delete("/delete_expense/{expense_id}")
+@app.delete("/delete_expense/{expense_id_to_del}")
 def delete_expense(expense_id: int):
 
     cursor_obj.execute(
