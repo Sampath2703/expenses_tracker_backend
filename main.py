@@ -82,12 +82,14 @@ def get_e(expenses_id: int):
     query = "SELECT * FROM expense WHERE expense_id=%s"
 
     cursor_obj.execute(query, (expenses_id,))
-    dataa = cursor_obj.fetchone()
+    data = cursor_obj.fetchone()
 
-    if dataa:
-        return {"expenses_data": dataa}
+    if not data:
+        raise HTTPException(status_code=404, detail="Expense not found")
 
-    return {"expenses_data": None}
+    return {"expenses_data": data}
+
+
     
 @app.put("/update_expenses/{expenses_id}")
 def update_expenses(expenses_id: int, updated_expenses_data: dict):
