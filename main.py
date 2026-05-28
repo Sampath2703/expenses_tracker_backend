@@ -146,9 +146,10 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
 @app.delete("/delete_expense/{expense_id}")
 def delete_expense(expense_id: int):
 
-    query = "DELETE FROM expenses1 WHERE expense_id=%s"
-
-    cursor_obj.execute(query, (expense_id,))
+    cursor_obj.execute(
+        "DELETE FROM expenses1 WHERE expense_id=%s",
+        (expense_id,)
+    )
     conn_obj.commit()
 
     if cursor_obj.rowcount == 0:
