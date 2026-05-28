@@ -34,7 +34,7 @@ cursor_obj.execute("""
 CREATE TABLE if not exists expense (
     exp_id INT AUTO_INCREMENT PRIMARY KEY,
     title VARCHAR(200) NOT NULL,
-    payment_method Not Null,
+    payment_method varchar(50) Not Null,
     amount FLOAT NOT NULL,
     category VARCHAR(100) NOT NULL,
     spent_at DATE NOT NULL
