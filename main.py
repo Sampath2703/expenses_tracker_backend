@@ -79,7 +79,7 @@ def get_expenses():
 @app.get("/get_expenses_single/{expenses_id}")
 def get_e(expenses_id: int):
 
-    query = "SELECT * FROM expense WHERE exp_id=%s"
+    query = "SELECT * FROM expense WHERE expense_id=%s"
 
     cursor_obj.execute(query, (expenses_id,))
     dataa = cursor_obj.fetchone()
