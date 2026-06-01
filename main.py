@@ -142,26 +142,19 @@ def update_expenses(expenses_id: int, updated_expenses_data: dict):
         return {
             "error": str(e)
         }
+    
 
 @app.delete("/delete_expense/{expense_id}")
 def delete_expense(expense_id: int):
 
     try:
-        conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="your_password",
-            database="your_database"
-        )
-
-        cursor = conn.cursor()
 
         query = "DELETE FROM expenses1 WHERE expense_id = %s"
 
-        cursor.execute(query, (expense_id,))
-        conn.commit()
+        cursor_obj.execute(query, (expense_id,))
+        conn_obj.commit()
 
-        if cursor.rowcount == 0:
+        if cursor_obj.rowcount == 0:
             return {
                 "message": f"Expense ID {expense_id} not found"
             }
@@ -171,16 +164,10 @@ def delete_expense(expense_id: int):
         }
 
     except Exception as e:
+
         return {
             "error": str(e)
         }
-
-    finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
 
 @app.get("/search_expenses")
 def search_expense(search_text:str):
